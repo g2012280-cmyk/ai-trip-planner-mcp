@@ -2,6 +2,44 @@
 
 An AI-powered travel itinerary generator for cities across China. Enter a destination, travel dates, and preferences — the app returns a day-by-day plan with attractions, meals, hotels, weather, and a cost breakdown.
 
+## Architecture
+
+```
+  User request
+       │
+       ▼
+┌─────────────────────────────────────────┐
+│         Orchestration Layer             │
+│                                         │
+│  DeepSeek LLM  ·  4 specialised agents  │
+│                                         │
+│  Understands intent, decomposes tasks,  │
+│  and assembles the final itinerary      │
+└──────────┬──────────────────────────────┘
+           │ needs real-world data
+           ▼
+┌─────────────────────────────────────────┐
+│            Tooling Layer                │
+│                                         │
+│  Amap MCP Server  (@amap/amap-maps-*)   │
+│                                         │
+│  Live POI search · weather · geocoding  │
+└──────────┬──────────────────────────────┘
+           │ raw LLM output
+           ▼
+┌─────────────────────────────────────────┐
+│          Validation Layer               │
+│                                         │
+│  Pydantic v2 schemas                    │
+│                                         │
+│  Enforces types, rejects bad output,    │
+│  guarantees the frontend gets clean JSON│
+└──────────┬──────────────────────────────┘
+           │ structured TripPlan
+           ▼
+       Frontend
+```
+
 ## How it works
 
 Four specialised agents run in sequence:
